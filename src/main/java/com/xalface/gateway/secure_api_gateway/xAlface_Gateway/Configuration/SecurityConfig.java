@@ -8,8 +8,6 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
@@ -17,7 +15,6 @@ import org.springframework.security.oauth2.server.resource.authentication.Reacti
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import reactor.core.publisher.Mono;
 
-import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
 @Configuration
@@ -35,19 +32,16 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/auth/**").permitAll()
                         .pathMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        // Definir padrões para serviços baseados em seus nomes registrados no Eureka
-                        .pathMatchers("/auth-service/**").permitAll()
-                        .pathMatchers("/reservation-service/reservation/create").hasAuthority("TEACHER")
-                        .pathMatchers("/reservation-service/reservation/mine").hasAuthority("TEACHER")
-                        .pathMatchers("/reservation-service/reservation/classroom/**").permitAll()
-                        .pathMatchers("/reservation-service/reservation/{id}").hasAuthority("ADMIN")
-                        .pathMatchers("/reservation-service/reservation/all").hasAuthority("ADMIN")
-                        .pathMatchers("/reservation-service/reservation/update/{id}").hasAuthority("ADMIN")
-                        .pathMatchers("/reservation-service/reservation/delete/{id}").hasAuthority("ADMIN")
-                        .pathMatchers("/classroom-service/classrooms").hasAuthority("ADMIN")
-                        .pathMatchers("/classroom-service/classrooms/{id}").authenticated()
-                        .pathMatchers("/teacher-service/**").hasAuthority("ADMIN")
-                        .pathMatchers("/admin-service/**").hasAuthority("ADMIN")
+                        .pathMatchers("/xalface-authservice/**").permitAll()
+                        .pathMatchers("/xalface-reservationservice/reservation/create").hasAuthority("TEACHER")
+                        .pathMatchers("/xalface-reservationservice/reservation/mine").hasAuthority("TEACHER")
+                        .pathMatchers("/xalface-reservationservice/reservation/classroom/**").permitAll()
+                        .pathMatchers("/xalface-reservationservice/reservation/{id}").hasAuthority("ADMIN")
+                        .pathMatchers("/xalface-reservationservice/reservation/all").hasAuthority("ADMIN")
+                        .pathMatchers("/xalface-reservationservice/reservation/update/{id}").hasAuthority("ADMIN")
+                        .pathMatchers("/xalface-reservationservice/reservation/delete/{id}").hasAuthority("ADMIN")
+                        .pathMatchers("/xalface-userservice/**").permitAll()
+                        .pathMatchers("/actuator/**").permitAll()
                         .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -65,11 +59,6 @@ public class SecurityConfig {
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
 
         return new ReactiveJwtAuthenticationConverterAdapter(jwtAuthenticationConverter);
-    }
-
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     @Bean
